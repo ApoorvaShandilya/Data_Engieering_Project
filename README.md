@@ -21,11 +21,11 @@ Young tourists need scooters downtown or at tourist spots.
 ### Addressing Asymmetry: 
 Gans plans to use trucks or incentives for users to balance scooter distribution.
 
-###Anticipating Movement: 
+### Anticipating Movement: 
 Gans aims to predict scooter movement for better operations. Data collection and transformation are initial steps. 
 The challenge is to build an automated cloud-based data pipeline for real-time data accessible to all.
 
-###Our Role: 
+### Our Role: 
 Collect data from external sources to help predict e-scooter movement. Assemble an automated cloud data pipeline for daily, real-time access by the company.
 
 In essence, Gans seeks to optimize scooter placement for operational success through predictive modeling and an efficient cloud-based data pipeline.
