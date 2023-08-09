@@ -1,0 +1,99 @@
+<pre><code>
+import json
+import pytz
+import requests
+import pandas as pd
+from datetime import datetime
+
+def lambda_handler(event, context):
+    # Database connection details
+    schema = "Gans_Support_data"
+    host = ""
+    user = "admin"
+    password = "PASSWORD"  # os.environ.get('PASSWORD')
+    port = 3306
+    con = f'mysql+pymysql://{user}:{password}@{host}:{port}/{schema}'
+
+    # TODO implement any other required functionality
+
+    # List of example cities to collect weather data
+    cities = ['Berlin', 'Hannover', 'Bremen', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Leipzig',
+              'Dresden', 'Paris', 'Barcelona', 'Lisbon', 'Vienna', 'Brussels', 'Amsterdam', 'Budapest']
+    cities_df = pd.DataFrame()
+
+    # Loop through cities and collect weather data, then append it to cities_df
+    for city in cities:
+        city_data = get_cities(city)  # get_cities() returns a pandas DataFrame
+        cities_df = pd.concat([cities_df, city_data])
+
+    # Save cities data to the database
+    cities_df.to_sql('cities', if_exists='append', con=con, index=False)
+
+    # Retrieve airports data using latitude and longitude from cities_df
+    lats = cities_df['lat']
+    lons = cities_df['lon']
+    airports_df = retrieve_airport(lats, lons)
+
+    # Save airports data to the database
+    airports_df.to_sql('airports', if_exists='append', con=con, index=False)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
+
+def get_cities(city):
+    # Define timezone for the city data
+    tz = pytz.timezone('Europe/Berlin')
+    now = datetime.now().astimezone(tz)
+
+    # API key for OpenWeatherMap
+    API_key = "Your_API_Key"
+
+    # Collect weather information for the specified city
+    weathers = requests.get(f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_key}&units=metric").json()
+
+    # Normalize the 'city' data into cities_df DataFrame
+    cities_df = pd.json_normalize(weathers['city'])
+
+    # Rename columns in the cities_df
+    cities_df.rename(columns={'name': 'city', 'coord.lat': 'lat', 'coord.lon': 'lon'}, inplace=True)
+
+    # Add 'timestamp_population' column to the cities_df
+    cities_df['timestamp_population'] = now.strftime("%Y")
+
+    # Remove unwanted columns from cities_df
+    columns_to_delete = ['timezone', 'sunrise', 'sunset', 'id']
+    cities_df.drop(columns=columns_to_delete, inplace=True)
+
+    return cities_df
+
+def retrieve_airport(lat, lon):
+    list_for_df = []
+
+    # Loop through latitudes and longitudes to retrieve airports data
+    for lat, lon in zip(lat, lon):
+        url = "https://aerodatabox.p.rapidapi.com/airports/search/location"
+        querystring = {"lat": lat, "lon": lon, "radiusKm": "50", "limit": "10", "withFlightInfoOnly": "true"}
+        headers = {
+            "X-RapidAPI-Key": "Your_API_Key",
+            "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com"
+        }
+
+        # Make the API request to retrieve airports data
+        response = requests.get(url, headers=headers, params=querystring)
+        list_for_df.append(pd.json_normalize(response.json()['items']))
+
+    # Concatenate the list of DataFrames into airports_df
+    airports_df = pd.concat(list_for_df, ignore_index=True)
+
+    # Rename columns in airports_df
+    airports_df.rename(columns={'name': 'airport', 'municipalityName': 'municipality'}, inplace=True)
+
+    # Remove unwanted columns from airports_df
+    columns_to_delete = ['iata', 'shortName', 'countryCode', 'location.lat', 'location.lon']
+    airports_df.drop(columns=columns_to_delete, inplace=True)
+
+    return airports_df
+
+</code></pre>
