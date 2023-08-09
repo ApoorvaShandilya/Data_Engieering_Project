@@ -16,6 +16,7 @@ The challenge is to build an automated cloud-based data pipeline for real-time d
 ### Our Role: 
 Collect data from external sources to help predict e-scooter movement. Assemble an automated cloud data pipeline for daily, real-time access by the company.
 
-## Repository Structure 
+## Code 
+Code folder has script to run lambda function  and function for local data base 
 
  
