@@ -13,10 +13,13 @@ Mornings see movement from homes to city centers.Rain reduces scooter use signif
 Gans plans to use trucks or incentives for users to balance scooter distribution.
 Gans aims to predict scooter movement for better operations. Data collection and transformation are initial steps. 
 The challenge is to build an automated cloud-based data pipeline for real-time data accessible to all.
-### Our Role: 
+## Our Role: 
 Collect data from external sources to help predict e-scooter movement. Assemble an automated cloud data pipeline for daily, real-time access by the company.
 
-## Code 
-Code folder has script to run lambda function  and function for local data base 
+## Code used 
+Code folder has script to run lambda function  and function for local data base.
+
+## Blog post 
+This project also include a Medium Blog Post : [From Web Scraping to AWS Cloud : Building an End-to-End Data Collection Pipeline](https://medium.com/@shandilya90apoorva/from-web-scraping-to-aws-cloud-building-an-end-to-end-data-collection-pipeline-bb6172d5daa8)
 
  
